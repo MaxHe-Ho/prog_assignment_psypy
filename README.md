@@ -1,7 +1,9 @@
 # prog_assignment_psypy
 
-## important sub-heading: It's a matching pennies game
-important details of the game & important details of the program
+## Sub-heading: It's a matching pennies game
+Click [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/prog_ass_psypy_mp.py) to get to the main program.
+
+Important details of the game & important details of the program
 ...
 and so on
 ...
