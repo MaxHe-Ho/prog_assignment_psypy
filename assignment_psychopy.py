@@ -20,15 +20,12 @@ Think of the testing function!
 """
 
 import os
-import statistics
 import random
 from psychopy import data, event, core, visual
-import imageio
-from matplotlib import pyplot
 
 # %% Window & Text stimuli
 
-win = visual.Window(size=[1024,768])#, mon='DELL U2719D')
+win = visual.Window()#size=[1024,768]
 
 welcome_text = """Welcome to my experiment.
 You will play matching pennies against the computer.
@@ -71,7 +68,7 @@ win.flip()
 
 core.wait(2)
 
-# %% necessary variables, start of loop
+# %% necessary & self-explanatory variables, start of loop
 
 wins = 0
 losses = 0
@@ -100,28 +97,8 @@ while True:
     choice_subject = keys[0]
     print("Your choice: ", choice_subject)
     
-    """
-    
-    filename = "1euro_heads.jpg"
-
-    filepath = os.path.join("data", filename)
-    print(filepath)
-
-    coin_heads = imageio.imread(filepath)
-    print(coin_heads)
-
-    #pyplot.imshow(coin_heads)
-    
-    heads = visual.ImageStim(win,image=coin_heads)
-    heads.draw()
-    win.flip()
-    
-    core.wait(3)
-    """   
-    
 # %% choice computer
     
- ###save computer's choice from previous round to compute the amount of changes the subject makes from the computer's previous choice, display afterwards
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
         if choice_computer != choice_subject  : #the variable choice_computer is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop
@@ -147,37 +124,53 @@ while True:
             
     print("Computer's choice: ", choice_computer)
 
-# %% Display both pennies
+# %% Display choice of user & computer with images
     
+    #save path of images
     f_heads = os.path.join("data", "penny_heads.png")
     f_tails = os.path.join("data", "penny_tails.png")
     
-    #all in right position
-    # if choice_subject = 'h':
-        #show text + heads
-    # else:
-        #show other text + tails
+    #Create the texts "Your choice:" and "Computer's choice" 
+    txt_user = visual.TextStim (win, pos = (-0.5,0.6), text='Your choice:')
+    txt_com = visual.TextStim (win, pos = (0.5,0.6), text="Computer's choice")
+    
+    #gets image of head of penny ready to be displayed if user chooses head
+    if choice_subject == 'h':
+        heads = visual.ImageStim(win,size = (0.7,0.94), pos = (-0.5,-0.2), image=f_heads)
+        heads.draw()
+        #gets image of head of penny ready to be displayed if computer chooses head
+        if choice_computer == 'h':
+            heads = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_heads)
+            heads.draw()
+        #gets image of tail of penny ready to be displayed if computer chooses tail
+        else:
+            tails = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_tails)
+            tails.draw()
+        #get text for user and computer ready to be displayed
+        txt_user.draw()
+        txt_com.draw()
+        #prints everything on the screen and waits 2 seconds
+        win.flip()
+        core.wait(2) 
         
-    # if choice_computer = 'h':
-        #show text + heads
-    #else:
-        #show other com text + tails
-    
-    heads = visual.ImageStim(win,size = (1,1.3), image=f_heads)
-    heads.draw()
-    win.flip()
-    
-    #txt_user = visual.TextStim (win, text='Your choice:')
-    #txt_com = visual.TextStim (win, text="Computer's choice")
-    
-    core.wait(2) 
-    
-    tails = visual.ImageStim(win,size = (1,1.3), image=f_tails)
-    tails.draw()
-    win.flip()
-    
-    core.wait(2)
-    
+    #gets image of tail of penny ready to be displayed if user chooses tail    
+    else:
+        tails = visual.ImageStim(win,size = (0.7,0.94), pos = (-0.5,-0.2), image=f_tails)
+        tails.draw()
+        #gets image of head of penny ready to be displayed if computer chooses head
+        if choice_computer == 'h':
+            heads = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_heads)
+            heads.draw()
+        #gets image of tail of penny ready to be displayed if computer chooses tail
+        else:
+            tails = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_tails)
+            tails.draw()
+        #get text for user and computer ready to be displayed
+        txt_user.draw()
+        txt_com.draw()
+        #prints everything on the screen and waits 2 seconds
+        win.flip()
+        core.wait(2)
 
 
 # %% results round & game
@@ -207,9 +200,8 @@ while True:
         losses += 1
 
         core.wait(1) #wait a shorter amount of time for well-being of user
-        
-        
-    #display result of game so far to user
+               
+    #display result of the game so far to user
     _game_info = visual.TextStim(win, text= game_info)
     _game_info.draw()
     win.flip()
