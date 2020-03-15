@@ -27,15 +27,14 @@ from psychopy import data, event, core, visual
 
 win = visual.Window()#size=[1024,768]
 
-welcome_text = """Welcome to my experiment.
-You will play matching pennies against the computer.
-Press any key to begin.
-"""
+welcome_text = """Welcome to my experiment. You will play matching pennies against the computer.
 
-instruction_text = """You are the "even" player, i.e. you win a given round when the amount of heads and tails by you and the computer is even.
-Press 'h' for head and 't' for tails.
-To exit, press q.
-"""
+Press any key to begin."""
+
+instruction_text = """You are the "even" player, i.e. you win a given round when the amount of heads and tails presented by you 
+and the computer together is even. Press 'h' for head and 't' for tails. 
+
+To exit, press q."""
 
 welcome = visual.TextStim (win, text = welcome_text)
 instruction = visual.TextStim (win, text = instruction_text)
@@ -52,7 +51,7 @@ def quit_function(func_1, func_2):
 #clear global keys to avoid problem when spacebar is used to skip intro text
 event.globalKeys.clear()
 
-#Keys to quit the experiment at any time ##what's the error sign? Why does it show the attribute error but work fine?
+#Keys to quit the experiment at any time ##Why does it show the attribute error? Why does it only work sometimes for both 'q' and 'escape'?
 event.globalKeys.add(key='q', func=win.close)
 event.globalKeys.add(key='escape', func=quit_function(core.quit, win.close))
 
@@ -78,7 +77,7 @@ choice_change_computer = 0
 
 #The cut-off variable is (nearly) equal to the probability of the computer choosing heads.
 #So to bias the computer towards choosing heads more often, increase it. 
-# And to bias it towards choosing tails, decrease it.
+#And to bias it towards choosing tails, decrease it.
 cut_off = 0.5
 
 while True:
@@ -95,7 +94,7 @@ while True:
         
     #choice_subject
     choice_subject = keys[0]
-    print("Your choice: ", choice_subject)
+    #print("Your choice: ", choice_subject)
     
 # %% choice computer
     
@@ -105,7 +104,7 @@ while True:
             choice_change_computer += 1   
  
     ran_float = random.random()
-    print(ran_float)
+    #print(ran_float)
     #use random float for choice of computer
     if ran_float < cut_off:
         choice_computer = 'h'
@@ -122,7 +121,7 @@ while True:
 #        choice_computer = 't'
 #    else: choice_computer = 'h'
             
-    print("Computer's choice: ", choice_computer)
+    #print("Computer's choice: ", choice_computer)
 
 # %% Display choice of user & computer with images
     
@@ -130,9 +129,10 @@ while True:
     f_heads = os.path.join("data", "penny_heads.png")
     f_tails = os.path.join("data", "penny_tails.png")
     
-    #Create the texts "Your choice:" and "Computer's choice" 
+    #Create the texts "Your choice:", "Computer's choice:" and "to continue, press any key" 
     txt_user = visual.TextStim (win, pos = (-0.5,0.6), text='Your choice:')
-    txt_com = visual.TextStim (win, pos = (0.5,0.6), text="Computer's choice")
+    txt_com = visual.TextStim (win, pos = (0.5,0.6), text="Computer's choice:")
+    txt_continue = visual.TextStim (win, pos = (0,-0.85), text="to continue, press any key", height = 0.08)
     
     #gets image of head of penny ready to be displayed if user chooses head
     if choice_subject == 'h':
@@ -149,9 +149,10 @@ while True:
         #get text for user and computer ready to be displayed
         txt_user.draw()
         txt_com.draw()
-        #prints everything on the screen and waits 2 seconds
+        txt_continue.draw()
+        #prints everything on the screen and waits for key to be pressed
         win.flip()
-        core.wait(2) 
+        event.waitKeys() 
         
     #gets image of tail of penny ready to be displayed if user chooses tail    
     else:
@@ -168,39 +169,35 @@ while True:
         #get text for user and computer ready to be displayed
         txt_user.draw()
         txt_com.draw()
-        #prints everything on the screen and waits 2 seconds
+        txt_continue.draw()
+        #prints everything on the screen and waits key to be pressed
         win.flip()
-        core.wait(2)
+        event.waitKeys() 
 
 
 # %% results round & game
     
-    #info for user
-    game_info = "This is round ", rounds, ". You won ", wins, "times. You lost", losses, " times.", " You changed your own choice ", choice_change_subject, " times. You changed ", choice_change_computer, " times from the computers choice in the previous round."
-    #game_info = "This is round {}. You won {} times. You lost {} times." ## --> unfortunately does not work, why?
-    #game_info.format("rounds", "wins", "losses")
-    
     if choice_subject == choice_computer:
-        
         #display result of round to user
         winner.draw()
         win.flip()
-        
-        #raise wins by 1
+        #raise wins by 1  and wait shortly
         wins += 1
-
         core.wait(1.5) #wait a longer amount of time for well-being of user
 
     else:
         #display result of round to user
         loser.draw()
         win.flip()
-        
-        #raise losses by 1
+        #raise losses by 1 and wait shortly
         losses += 1
-
         core.wait(1) #wait a shorter amount of time for well-being of user
-               
+        
+    #info for user at the end of the round.
+    game_info = "This is round ", rounds, ". You won ", wins, "times. You lost", losses, " times.", " You changed your own choice ", choice_change_subject, " times. You changed ", choice_change_computer, " times from the computers choice in the previous round."
+    #game_info = "This is round {}. You won {} times. You lost {} times." ## --> unfortunately does not work, why?
+    #game_info.format(rounds, wins, losses)     
+          
     #display result of the game so far to user
     _game_info = visual.TextStim(win, text= game_info)
     _game_info.draw()
