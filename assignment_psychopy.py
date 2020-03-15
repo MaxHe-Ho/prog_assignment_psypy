@@ -9,8 +9,8 @@ By pressing 'h', the subject chooses heads and by pressing 't', the subject choo
 randomly. After the subject has made their choice, both pennies are shown on the screen and subject gets the 
 information whether they won and what the current scores are. The subject can quit at any point by pressing 'q'.
 Additional features:
-    - Computer with a different strategy than 'random choice' --> bias in direction of heads or tails or sticking to/ switching from previous round (or different response
-      than player beforehands, frustrator).
+    - Computer with a different strategy than 'random choice' --> bias in direction of heads or tails or sticking to/ switching 
+      from its or your choice in the previous round also: frustrator.
     - printout at the end of the program showing how often the subject switched their choice from own & computers choice in previous round.
 
 User experience really important!
@@ -80,49 +80,103 @@ choice_change_computer = 0
 #And to bias it towards choosing tails, decrease it.
 cut_off = 0.5
 
+#use bias variable to determine the bias of the computer i.e. the degree to which its decision will diverge from a 50/50 chance for heads and tails 
+#choose a bias between -0.5 and +0.5
+bias = 0.45
+
+##To make this psychologically interesting, perhaps as a harder test like the Wisconsin Card Sorting Test, the user could be asked to find out the strategy of the computer, which is changed at times
+#change one of the following biases to True if you want that bias to be implemented
+#think about which changes make sense in combination. Some combinations will result in an error (?You can combine the first 2 with each of the last 4 but you cannot combine the last 4 among each other?)
+bias_heads = False
+bias_tails = False
+
+bias_stick_to_prev_com_choice = False
+bias_switch_from_prev_com_choice = False
+
+bias_stick_to_prev_user_choice = False
+bias_switch_from_prev_user_choice = False
+
+#In case you want to be evil: To turn the computer to a frustrator, i.e. a device that always chooses the opposite of the user & thus 
+#guarantees that the user looses, set frustrator to True. ##collecting data from user reacting to frustrator may even be somewhat psychologically interesting
+frustrator = False
+
 while True:
     
-# %% choice user
+# %% choice user & two biases of the computer
     
     #wait for & restrict keys
     keys = event.waitKeys(keyList=(['h', 't']))
 
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
-        if choice_subject != keys[0]: #the variable choice_subject is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop
+        if choice_subject != keys[0]: #the variable choice_subject is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop. As the same warning simply reoccurs in the following, I didn't comment it again.
             choice_change_subject += 1
+            
+        #biases the computer towards sticking to the users previous choice
+        if bias_stick_to_prev_user_choice == True:
+            if choice_subject == 'h':
+                cut_off = 0.5 + bias
+            else:
+                cut_off = 0.5 - bias
+        
+        #biases the computer towards switching from the users previous choice
+        if bias_switch_from_prev_user_choice == True:
+            if choice_subject == 'h':
+                cut_off = 0.5 - bias
+            else:
+                cut_off = 0.5 + bias
         
     #choice_subject
     choice_subject = keys[0]
-    #print("Your choice: ", choice_subject)
     
 # %% choice computer
     
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
-        if choice_computer != choice_subject  : #the variable choice_computer is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop
+        if choice_computer != choice_subject  : #the variable choice_computer is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop. 
             choice_change_computer += 1   
- 
+    
+        #biases the computer towards sticking to its previous choice
+        if bias_stick_to_prev_com_choice == True:
+            if choice_computer == 'h':
+                cut_off = 0.5 + bias
+            else:
+                cut_off = 0.5 - bias
+                
+        #biases the computer towards switching from its previous choice
+        if bias_switch_from_prev_com_choice == True:
+            if choice_computer == 'h':
+                cut_off = 0.5 - bias
+            else:
+                cut_off = 0.5 + bias
+    
+    #biases the computer towards heads
+    if bias_heads == True:
+        cut_off = cut_off + bias
+    
+    #biases the computer towards tails
+    if bias_tails == True:
+        cut_off = cut_off - bias
+        
+    #create random float
     ran_float = random.random()
-    #print(ran_float)
-    #use random float for choice of computer
+    
+    #use random float to determine the computer's choice
     if ran_float < cut_off:
         choice_computer = 'h'
     elif ran_float > cut_off:
         choice_computer = 't'
-
-        #just to be super fair and not give either 'h' or 't' a slight advantage, in case ran_float == 0.5, there is a new random choice
+    #just to be super fair and not give either 'h' or 't' a slight advantage, in case ran_float == cut_off, there is a new random choice
     else:
         choice_computer = random.choice(['h', 't'])
-
-    #Just in case you want to be evil: To turn the computer to a frustrator, i.e. a device that always chooses the opposite of the user & thus 
-    #guarantees that the user looses, delete the '#' in lines 120-122 and put a '#' in front of the other lines in the "choice computer" section
-#    if choice_subject == 'h':
-#        choice_computer = 't'
-#    else: choice_computer = 'h'
-            
-    #print("Computer's choice: ", choice_computer)
-
+    
+    #enable to turn the computer into a frustrator
+    #aware of the fact that this simply overwrites the previous value of choice_computer
+    if frustrator == True:
+        if choice_subject == 'h':
+            choice_computer = 't'
+        else: choice_computer = 'h'
+    
 # %% Display choice of user & computer with images
     
     #save path of images
@@ -183,7 +237,7 @@ while True:
         win.flip()
         #raise wins by 1  and wait shortly
         wins += 1
-        core.wait(1.5) #wait a longer amount of time for well-being of user
+        core.wait(1.5) #wait a longer amount of time than for loss for well-being of user
 
     else:
         #display result of round to user
@@ -191,7 +245,7 @@ while True:
         win.flip()
         #raise losses by 1 and wait shortly
         losses += 1
-        core.wait(1) #wait a shorter amount of time for well-being of user
+        core.wait(1) #wait a shorter amount of time than for a win for well-being of user
         
     #info for user at the end of the round.
     game_info = "This is round ", rounds, ". You won ", wins, "times. You lost", losses, " times.", " You changed your own choice ", choice_change_subject, " times. You changed ", choice_change_computer, " times from the computers choice in the previous round."
