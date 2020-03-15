@@ -1,16 +1,12 @@
 # prog_assignment_psypy
 
-## Sub-heading: It's a matching pennies game
-Click [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/prog_ass_psypy_mp.py) to get to the main program.
+## It's a matching pennies game
+Click [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/assignment_psychopy.py) to get to the main program.
 
-Important details of the game & important details of the program
-...
-and so on
-...
+  Important details of the game & important details of the program...
 
-### such wow! Even a sub-sub-heading
-extreme wow: even a link: To find out details about your greatest ability, way more reliable than online personality tests and horoscopes, click [here](https://en.wikipedia.org/wiki/Procrastination).
+### License information
+If you actually want to read license information, you can find it [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/LICENSE).
 
-### license information
-If you actually want to read this, you can find the license file [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/LICENSE).
-
+#### Such wow! Much useful information about yourself you always wanted to have!!
+To find out details about your greatest ability, way more reliable than online personality tests and horoscopes, click [here](https://en.wikipedia.org/wiki/Procrastination). 
