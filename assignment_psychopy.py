@@ -10,12 +10,11 @@ randomly. After the subject has made their choice, both pennies are shown on the
 information whether they won and what the current scores are. The subject can quit at any point by pressing 'q'.
 Additional features:
     - Computer with a different strategy than 'random choice' --> bias in direction of heads or tails or sticking to/ switching 
-      from its or your choice in the previous round also: frustrator.
-    - printout at the end of the program showing how often the subject switched their choice from own & computers choice in previous round.
+      from its or users choice in the previous round. Computer can also be turned into a frustrator.
+    - Printout at the end of the program showing how often the subject switched their choice from own & computers choice in previous round.
 
 User experience really important!
 
-Think of some errors/ exceptions & useful messages for that
 Think of the testing function!
 """
 
@@ -25,7 +24,7 @@ from psychopy import data, event, core, visual
 
 # %% Window & Text stimuli
 
-win = visual.Window()#size=[1024,768]
+win = visual.Window()
 
 welcome_text = """Welcome to my experiment. You will play matching pennies against the computer.
 
@@ -44,15 +43,16 @@ loser = visual.TextStim (win, text='YOU LOSE!', color='red')
 
 # %% quit function and quit keys
 
-#define quit function
+#quit function which takes two functions as input and returns both, is used below for global event keys
 def quit_function(func_1, func_2):
     return func_1 and func_2
 
 #clear global keys to avoid problem when spacebar is used to skip intro text
 event.globalKeys.clear()
 
-#Keys to quit the experiment at any time ##Why does it show the attribute error? Why does it only work sometimes for both 'q' and 'escape'?
-event.globalKeys.add(key='q', func=win.close)
+#Keys to quit the experiment at any time 
+#AttributeError because it still runs the loop but win is closed and then asked to flip again towards the end. Nevertehless prefered option over many exit options throughout the program
+event.globalKeys.add(key='q', func=quit_function(core.quit, win.close))
 event.globalKeys.add(key='escape', func=quit_function(core.quit, win.close))
 
 # %%Intro screens
@@ -65,9 +65,9 @@ event.waitKeys()
 instruction.draw()
 win.flip()
 
-core.wait(2)
+event.waitKeys()
 
-# %% necessary & self-explanatory variables, start of loop
+# %% necessary & self-explanatory variables
 
 wins = 0
 losses = 0
@@ -75,56 +75,139 @@ rounds = 1
 choice_change_subject = 0
 choice_change_computer = 0
 
-#The cut-off variable is (nearly) equal to the probability of the computer choosing heads.
-#So to bias the computer towards choosing heads more often, increase it. 
-#And to bias it towards choosing tails, decrease it.
-cut_off = 0.5
+# %% bias variables
 
-#use bias variable to determine the bias of the computer i.e. the degree to which its decision will diverge from a 50/50 chance for heads and tails 
-#choose a bias between -0.5 and +0.5
-bias = 0.45
+#change value of the bias variable to determine the bias of the computer i.e. the degree to which its decision will diverge from a 50/50 chance for heads and tails 
+#the value determines the degree of all the (possible) biases below (if they are activated)
+#choose a bias between -0.5 and +0.5! 
+bias = 0.4
 
-##To make this psychologically interesting, perhaps as a harder test like the Wisconsin Card Sorting Test, the user could be asked to find out the strategy of the computer, which is changed at times
+##As an adaptation of this program to make it psychologically more interesting and turn it into a test somewhat like the Wisconsin Card Sorting Test, the user could be asked to find out the bias of the computer which is changed at times
 #change one of the following biases to True if you want that bias to be implemented
-#think about which changes make sense in combination. Some combinations will result in an error (?You can combine the first 2 with each of the last 4 but you cannot combine the last 4 among each other?)
+#to make the program flexible, the biases can be freely combined amongst each other except for the frustrator, 
+#which cannot be combined with another bias. Though of course the effects of some biases cancel each other out
+
+#To bias the computer towards choosing heads more often, set the "bias_heads"-variable to True (and perhaps adjust the bias above)
 bias_heads = False
+#To bias the computer towards choosing tails more often, set the "bias_tails"-variable to True (and perhaps adjust the bias above)
 bias_tails = False
 
+#To bias the computer towards sticking to its own previous choice more often, set the "bias_stick_to_prev_com_choice"-variable to True (and perhaps adjust the bias above)
 bias_stick_to_prev_com_choice = False
+#To bias the computer towards switching from its own previous choice more often, set the "bias_switch_from_prev_com_choice"-variable to True (and perhaps adjust the bias above)
 bias_switch_from_prev_com_choice = False
 
+#To bias the computer towards sticking to the users previous choice more often, set the "bias_stick_to_prev_user_choice"-variable to True (and perhaps adjust the bias above)
 bias_stick_to_prev_user_choice = False
+#To bias the computer towards switching from the users previous choice more often, set the "bias_switch_from_prev_com_choice"-variable to True (and perhaps adjust the bias above)
 bias_switch_from_prev_user_choice = False
 
-#In case you want to be evil: To turn the computer to a frustrator, i.e. a device that always chooses the opposite of the user & thus 
-#guarantees that the user looses, set frustrator to True. ##collecting data from user reacting to frustrator may even be somewhat psychologically interesting
+#In case you want to be evil and turn the computer into a frustrator, i.e. a device that always chooses the opposite of the user and thus 
+#guarantees that the user looses, set the "frustrator"-variable to True. 
+##As an adaptation of the program, one might collect data (as the amount of attempts and reaction times) from user reacting to frustrator in order to get e.g. some proxy of frustration tolerance or trust in the experimenter
 frustrator = False
 
+# %% bias functions, start of loop and cut_off variable
+
+#function to give error message for bad values of the bias and except for that only returns the bias
+def bias_function (bias):
+    if bias < -0.5:
+        win.close()
+        raise ValueError ("""You chose a value for bias that is smaller than -0.5. As the cut-off 
+                         value is equal to 0.5, which is used to compute probabilities, adding a 
+                         value smaller than -0.5 makes the probability negative. Probabilites however 
+                         are always >= 0 (at least on standard interpretations of probabilities).
+                         Try a value that is between -0.5 and 0.5 instead!""")
+    if bias > 0.5:
+        win.close()
+        raise ValueError ("""You chose a value for bias that is bigger than 0.5. As the cut-off 
+                         value is equal to 0.5, which is used to compute probabilities, adding a 
+                         value bigger than 0.5 makes the probability <1. Probabilites however 
+                         are always <= 1 (at least on standard interpretations of probabilities).
+                         Try a value that is between -0.5 and 0.5 instead!""")
+    return bias
+
+#function for allowed combinations of biases
+def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator):
+    if frustrator == True:
+        if bias_heads or bias_tails or bias_stick_to_prev_com_choice or bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice or bias_switch_from_prev_user_choice == True:
+            raise ValueError("Frustrator is not compatible with other biases as it would simply cover all other possible effects")
+    return bias_heads and bias_tails and bias_stick_to_prev_com_choice and bias_switch_from_prev_com_choice and bias_stick_to_prev_user_choice and bias_switch_from_prev_user_choice and frustrator
+
+allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator)
+
+#function to bias the computer towards sticking to its previous choice
+def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
+    if choice_computer == 'h':
+        cut_off = 0.5 + bias_function(bias)
+    else:
+        cut_off = 0.5 - bias_function(bias)
+    return cut_off
+
+#function to bias the computer towards switching from its previous choice
+def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
+    if choice_computer == 'h':
+        cut_off = cut_off - bias_function(bias)
+    else:
+        cut_off = cut_off + bias_function(bias)
+    return cut_off
+
+#function to bias the computer towards sticking to the user's previous choice
+def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
+    if choice_subject == 'h':
+        cut_off = cut_off + bias_function(bias)
+    else:
+        cut_off = cut_off - bias_function(bias)
+    return cut_off
+
+#function to bias the computer towards switching from the user's previous choice
+def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
+    if choice_subject == 'h':
+        cut_off = cut_off - bias_function(bias)
+    else:
+        cut_off = cut_off + bias_function(bias)
+    return cut_off
+
+#function to bias the computer towards heads
+def bias_heads_function (cut_off, bias):
+    cut_off = cut_off + bias_function(bias)
+    return cut_off
+
+#function to bias the computer towards tails
+def bias_tails_function (cut_off, bias):
+    cut_off = cut_off - bias_function(bias)
+    return cut_off
+
+#function to turn the computer into a frustrator
+def frustrator_function (choice_subject, choice_computer):
+    if choice_subject == 'h':
+        choice_computer = 't'
+    else: choice_computer = 'h'
+    return choice_computer
+    
 while True:
+    
+    #The cut-off variable is (nearly) equal to the probability of the computer choosing heads.
+    #the variable is placed within the loop to avoid biases from the previous rounds to influence the next decisions by the computer
+    cut_off = 0.5
     
 # %% choice user & two biases of the computer
     
     #wait for & restrict keys
-    keys = event.waitKeys(keyList=(['h', 't']))
+    keys = event.waitKeys(keyList=(['h', 't', 'q', 'escape']))
 
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
         if choice_subject != keys[0]: #the variable choice_subject is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop. As the same warning simply reoccurs in the following, I didn't comment it again.
             choice_change_subject += 1
             
-        #biases the computer towards sticking to the users previous choice
+        #biases the computer towards sticking to the user's previous choice
         if bias_stick_to_prev_user_choice == True:
-            if choice_subject == 'h':
-                cut_off = 0.5 + bias
-            else:
-                cut_off = 0.5 - bias
+            cut_off = bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias)
         
-        #biases the computer towards switching from the users previous choice
+        #biases the computer towards switching from the user's previous choice
         if bias_switch_from_prev_user_choice == True:
-            if choice_subject == 'h':
-                cut_off = 0.5 - bias
-            else:
-                cut_off = 0.5 + bias
+            cut_off = bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias)
         
     #choice_subject
     choice_subject = keys[0]
@@ -133,32 +216,26 @@ while True:
     
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
-        if choice_computer != choice_subject  : #the variable choice_computer is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop. 
+        if choice_computer != choice_subject:
             choice_change_computer += 1   
-    
+            
         #biases the computer towards sticking to its previous choice
         if bias_stick_to_prev_com_choice == True:
-            if choice_computer == 'h':
-                cut_off = 0.5 + bias
-            else:
-                cut_off = 0.5 - bias
-                
+            cut_off = stick_to_prev_com_choice_function (choice_computer, cut_off, bias)
+        
         #biases the computer towards switching from its previous choice
         if bias_switch_from_prev_com_choice == True:
-            if choice_computer == 'h':
-                cut_off = 0.5 - bias
-            else:
-                cut_off = 0.5 + bias
+            cut_off = switch_from_prev_com_choice_function (choice_computer, cut_off, bias)
     
     #biases the computer towards heads
     if bias_heads == True:
-        cut_off = cut_off + bias
+        cut_off = bias_heads_function (cut_off, bias)
     
     #biases the computer towards tails
     if bias_tails == True:
-        cut_off = cut_off - bias
-        
-    #create random float
+        cut_off = bias_tails_function (cut_off, bias)
+    
+    #creates a random float
     ran_float = random.random()
     
     #use random float to determine the computer's choice
@@ -166,16 +243,17 @@ while True:
         choice_computer = 'h'
     elif ran_float > cut_off:
         choice_computer = 't'
-    #just to be super fair and not give either 'h' or 't' a slight advantage, in case ran_float == cut_off, there is a new random choice
+    #just to be super fair and not give either 'h' or 't' a slight (negligible) advantage, in case ran_float == cut_off, there is a new random choice
     else:
         choice_computer = random.choice(['h', 't'])
     
-    #enable to turn the computer into a frustrator
+    #turns the computer into a frustrator
     #aware of the fact that this simply overwrites the previous value of choice_computer
     if frustrator == True:
-        if choice_subject == 'h':
-            choice_computer = 't'
-        else: choice_computer = 'h'
+        choice_computer = frustrator_function (choice_subject, choice_computer)
+        #if choice_subject == 'h':
+         #   choice_computer = 't'
+        #else: choice_computer = 'h'
     
 # %% Display choice of user & computer with images
     
@@ -228,7 +306,6 @@ while True:
         win.flip()
         event.waitKeys() 
 
-
 # %% results round & game
     
     if choice_subject == choice_computer:
@@ -246,12 +323,13 @@ while True:
         #raise losses by 1 and wait shortly
         losses += 1
         core.wait(1) #wait a shorter amount of time than for a win for well-being of user
-        
-    #info for user at the end of the round.
-    game_info = "This is round ", rounds, ". You won ", wins, "times. You lost", losses, " times.", " You changed your own choice ", choice_change_subject, " times. You changed ", choice_change_computer, " times from the computers choice in the previous round."
-    #game_info = "This is round {}. You won {} times. You lost {} times." ## --> unfortunately does not work, why?
-    #game_info.format(rounds, wins, losses)     
-          
+    
+    ##As an adaptation of the program, one might abstain from displaying the round info and instead ask the user for her estimate on the amounts of wins & losses conditional on different waiting times for wins & losses
+    
+    #infos for user at the end of each round. Contains the number of rounds, wins, losses, changes from user's previous choice and changes from computer's previous choice
+    game_info = "This is round {}. You won {} times. You lost {} times. You changed your own choice {} times. You changed {} times from the computer's choice in the previous round."
+    game_info = game_info.format(rounds, wins, losses, choice_change_subject, choice_change_computer)     
+    
     #display result of the game so far to user
     _game_info = visual.TextStim(win, text= game_info)
     _game_info.draw()
