@@ -24,7 +24,7 @@ from psychopy import data, event, core, visual
 
 # %% Window & Text stimuli
 
-win = visual.Window()
+win = visual.Window(color='black')
 
 welcome_text = """Welcome to my experiment. You will play matching pennies against the computer.
 
@@ -131,6 +131,7 @@ def bias_function (bias):
 def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator):
     if frustrator == True:
         if bias_heads or bias_tails or bias_stick_to_prev_com_choice or bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice or bias_switch_from_prev_user_choice == True:
+            #win.close()
             raise ValueError("Frustrator is not compatible with other biases as it would simply cover all other possible effects")
     return bias_heads and bias_tails and bias_stick_to_prev_com_choice and bias_switch_from_prev_com_choice and bias_stick_to_prev_user_choice and bias_switch_from_prev_user_choice and frustrator
 
@@ -139,15 +140,15 @@ allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias
 #function to bias the computer towards sticking to its previous choice
 def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
     if choice_computer == 'h':
-        cut_off = 0.5 + bias_function(bias)
+        cut_off = cut_off + bias_function(bias)
     else:
-        cut_off = 0.5 - bias_function(bias)
+        cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
 #function to bias the computer towards switching from its previous choice
 def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
     if choice_computer == 'h':
-        cut_off = cut_off - bias_function(bias)
+        cut_off = round (cut_off - bias_function(bias), 2)
     else:
         cut_off = cut_off + bias_function(bias)
     return cut_off
@@ -157,13 +158,13 @@ def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
     if choice_subject == 'h':
         cut_off = cut_off + bias_function(bias)
     else:
-        cut_off = cut_off - bias_function(bias)
+        cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
 #function to bias the computer towards switching from the user's previous choice
 def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
     if choice_subject == 'h':
-        cut_off = cut_off - bias_function(bias)
+        cut_off = round (cut_off - bias_function(bias), 2)
     else:
         cut_off = cut_off + bias_function(bias)
     return cut_off
@@ -175,7 +176,7 @@ def bias_heads_function (cut_off, bias):
 
 #function to bias the computer towards tails
 def bias_tails_function (cut_off, bias):
-    cut_off = cut_off - bias_function(bias)
+    cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
 #function to turn the computer into a frustrator
@@ -251,9 +252,6 @@ while True:
     #aware of the fact that this simply overwrites the previous value of choice_computer
     if frustrator == True:
         choice_computer = frustrator_function (choice_subject, choice_computer)
-        #if choice_subject == 'h':
-         #   choice_computer = 't'
-        #else: choice_computer = 'h'
     
 # %% Display choice of user & computer with images
     
