@@ -54,6 +54,7 @@ event.globalKeys.clear()
 #AttributeError because it still runs the loop but win is closed and then asked to flip again towards the end. Nevertehless prefered option over many exit options throughout the program
 event.globalKeys.add(key='q', func=quit_function(core.quit, win.close))
 event.globalKeys.add(key='escape', func=quit_function(core.quit, win.close))
+#idea from https://www.psychopy.org/coder/globalKeys.html
 
 # %%Intro screens
 
