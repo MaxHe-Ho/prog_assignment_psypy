@@ -12,10 +12,6 @@ Additional features:
     - Computer with a different strategy than 'random choice' --> bias in direction of heads or tails or sticking to/ switching 
       from its or users choice in the previous round. Computer can also be turned into a frustrator.
     - Printout at the end of the program showing how often the subject switched their choice from own & computers choice in previous round.
-
-User experience really important!
-
-Think of the testing function!
 """
 
 import os
@@ -38,34 +34,60 @@ To exit, press q."""
 welcome = visual.TextStim (win, text = welcome_text)
 instruction = visual.TextStim (win, text = instruction_text)
 
-winner = visual.TextStim (win, text='YOU WIN!', color='green')
-loser = visual.TextStim (win, text='YOU LOSE!', color='red')
+winner = visual.TextStim (win, text='YOU WIN!', pos = (0, 0.6), color='green')
+loser = visual.TextStim (win, text='YOU LOSE!', pos = (0, 0.6), color='red')
 
-# %% quit function and quit keys
+txt_user = visual.TextStim (win, pos = (-0.5,0.42), text='Your choice:')
+txt_com = visual.TextStim (win, pos = (0.5,0.42), text="Computer's choice:")
+txt_continue = visual.TextStim (win, pos = (0,-0.85), text="Press any key to continue", height = 0.08)
 
-#quit function which takes two functions as input and returns both, is used below for global event keys
+#function that generates the updated score stimulus ready to be displayed on the screen
+def score_function (wins, losses):
+    """
+    Generates visual TextStim with score of the current round and specifies its location on the screen
+
+    Parameters
+    ----------
+    wins : int
+        stores the amount of wins of the subject
+    losses : int
+        stores the amount of losses of the subject
+
+    Returns
+    -------
+    score: visual.text.TextStim
+            Visual stimulus of the current score ready to be displayed
+
+    """
+    txt_score = """Score:
+{} - {}"""
+    txt_score = txt_score.format(wins, losses)
+    score = visual.TextStim (win, pos=(0, 0.86), text=txt_score)
+    return score
+
+# %% quit function and global quit key 'escape'
+
+#No Docstring for the quit function because it's exremely short & obvious. 
+#It simply takes two functions as input and returns both. It is used below for global event keys
 def quit_function(func_1, func_2):
     return func_1 and func_2
 
-#clear global keys to avoid problem when spacebar is used to skip intro text
+#clears global keys 
 event.globalKeys.clear()
-
-#Keys to quit the experiment at any time 
-#AttributeError because it still runs the loop but win is closed and then asked to flip again towards the end. Nevertehless prefered option over many exit options throughout the program
-event.globalKeys.add(key='q', func=quit_function(core.quit, win.close))
+#escape key can be used quit the experiment at any time also skipping the end screen, probably most useful for experimenter
+#despite reoccuring AttributeError used as a faster exit option throughout the whole program
 event.globalKeys.add(key='escape', func=quit_function(core.quit, win.close))
-#idea from https://www.psychopy.org/coder/globalKeys.html
+#Source for global event keys: https://www.psychopy.org/coder/globalKeys.html
 
 # %%Intro screens
 
 welcome.draw()
 win.flip()
-
 event.waitKeys()
 
 instruction.draw()
+txt_continue.draw()
 win.flip()
-
 event.waitKeys()
 
 # %% necessary & self-explanatory variables
@@ -105,13 +127,34 @@ bias_switch_from_prev_user_choice = False
 
 #In case you want to be evil and turn the computer into a frustrator, i.e. a device that always chooses the opposite of the user and thus 
 #guarantees that the user looses, set the "frustrator"-variable to True. 
-##As an adaptation of the program, one might collect data (as the amount of attempts and reaction times) from user reacting to frustrator in order to get e.g. some proxy of frustration tolerance or trust in the experimenter
 frustrator = False
+##As an adaptation of the program, one might collect data (as the amount of attempts and reaction times) from user reacting to frustrator in order to get e.g. some proxy of frustration tolerance or trust in the experimenter
 
 # %% bias functions, start of loop and cut_off variable
 
 #function to give error message for bad values of the bias and except for that only returns the bias
 def bias_function (bias):
+    """
+    Simply returns the bias
+    
+    Parameters
+    ----------
+    bias : float
+        the bias of the computer chosen by the experimenter.
+
+    Raises
+    ------
+    ValueError
+        raises an exception if the bias is smaller than -0.5 or bigger than 0.5
+        as this would in the end mean that the program had to calculate probabilities
+        smaller than 0 or bigger than 1.
+
+    Returns
+    -------
+    bias : float
+        the bias of the computer chosen by the experimenter.
+
+    """
     if bias < -0.5:
         win.close()
         raise ValueError ("""You chose a value for bias that is smaller than -0.5. As the cut-off 
@@ -130,6 +173,38 @@ def bias_function (bias):
 
 #function for allowed combinations of biases
 def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator):
+    """
+    simply returns all the bias functions
+
+    Parameters
+    ----------
+    bias_heads : function/ bool
+        DESCRIPTION.
+    bias_tails : TYPE
+        DESCRIPTION.
+    bias_stick_to_prev_com_choice : TYPE
+        DESCRIPTION.
+    bias_switch_from_prev_com_choice : TYPE
+        DESCRIPTION.
+    bias_stick_to_prev_user_choice : TYPE
+        DESCRIPTION.
+    bias_switch_from_prev_user_choice : TYPE
+        DESCRIPTION.
+    frustrator : TYPE
+        DESCRIPTION.
+
+    Raises
+    ------
+    ValueError
+        raises an exception if the bias function frustrator is combined with other functions.
+        This is because the frustrator doesn't work with probabilites and necessarily simply
+        overwrite all other biases. Closes win before raising the error to prevent win from getting stuck.
+
+    Returns
+    -------
+    all the parameters listed above with identical properties.
+
+    """
     if frustrator == True:
         if bias_heads or bias_tails or bias_stick_to_prev_com_choice or bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice or bias_switch_from_prev_user_choice == True:
             #win.close()
@@ -140,6 +215,24 @@ allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias
 
 #function to bias the computer towards sticking to its previous choice
 def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
+    """
+    
+
+    Parameters
+    ----------
+    choice_computer : TYPE
+        DESCRIPTION.
+    cut_off : TYPE
+        DESCRIPTION.
+    bias : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    cut_off : TYPE
+        DESCRIPTION.
+
+    """
     if choice_computer == 'h':
         cut_off = cut_off + bias_function(bias)
     else:
@@ -148,6 +241,24 @@ def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
 
 #function to bias the computer towards switching from its previous choice
 def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
+    """
+    
+
+    Parameters
+    ----------
+    choice_computer : TYPE
+        DESCRIPTION.
+    cut_off : TYPE
+        DESCRIPTION.
+    bias : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    cut_off : TYPE
+        DESCRIPTION.
+
+    """
     if choice_computer == 'h':
         cut_off = round (cut_off - bias_function(bias), 2)
     else:
@@ -156,6 +267,24 @@ def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
 
 #function to bias the computer towards sticking to the user's previous choice
 def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
+    """
+    
+
+    Parameters
+    ----------
+    choice_subject : TYPE
+        DESCRIPTION.
+    cut_off : TYPE
+        DESCRIPTION.
+    bias : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    cut_off : TYPE
+        DESCRIPTION.
+
+    """
     if choice_subject == 'h':
         cut_off = cut_off + bias_function(bias)
     else:
@@ -164,6 +293,24 @@ def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
 
 #function to bias the computer towards switching from the user's previous choice
 def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
+    """
+    
+
+    Parameters
+    ----------
+    choice_subject : TYPE
+        DESCRIPTION.
+    cut_off : TYPE
+        DESCRIPTION.
+    bias : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    cut_off : TYPE
+        DESCRIPTION.
+
+    """
     if choice_subject == 'h':
         cut_off = round (cut_off - bias_function(bias), 2)
     else:
@@ -172,16 +319,64 @@ def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
 
 #function to bias the computer towards heads
 def bias_heads_function (cut_off, bias):
+    """
+    
+
+    Parameters
+    ----------
+    cut_off : TYPE
+        DESCRIPTION.
+    bias : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    cut_off : TYPE
+        DESCRIPTION.
+
+    """
     cut_off = cut_off + bias_function(bias)
     return cut_off
 
 #function to bias the computer towards tails
 def bias_tails_function (cut_off, bias):
+    """
+    
+
+    Parameters
+    ----------
+    cut_off : TYPE
+        DESCRIPTION.
+    bias : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    cut_off : TYPE
+        DESCRIPTION.
+
+    """
     cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
 #function to turn the computer into a frustrator
 def frustrator_function (choice_subject, choice_computer):
+    """
+    
+
+    Parameters
+    ----------
+    choice_subject : TYPE
+        DESCRIPTION.
+    choice_computer : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    choice_computer : TYPE
+        DESCRIPTION.
+
+    """
     if choice_subject == 'h':
         choice_computer = 't'
     else: choice_computer = 'h'
@@ -193,11 +388,26 @@ while True:
     #the variable is placed within the loop to avoid biases from the previous rounds to influence the next decisions by the computer
     cut_off = 0.5
     
+# %%
+    round_txt = """This is round {}
+
+
+To choose heads, press 'h'.
+To choose tails, press 't'."""
+    round_txt = round_txt.format(rounds)
+    stim_round = visual.TextStim (win, text = round_txt)
+    stim_round.draw()
+    win.flip()
+    
 # %% choice user & two biases of the computer
     
     #wait for & restrict keys
     keys = event.waitKeys(keyList=(['h', 't', 'q', 'escape']))
-
+    
+    #quit option
+    if keys[0] == 'q':
+        break
+    
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
         if choice_subject != keys[0]: #the variable choice_subject is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop. As the same warning simply reoccurs in the following, I didn't comment it again.
@@ -254,89 +464,120 @@ while True:
     if frustrator == True:
         choice_computer = frustrator_function (choice_subject, choice_computer)
     
-# %% Display choice of user & computer with images
+    
+# %% Display choice of the user and computer with images as well as results with text
     
     #save path of images
     f_heads = os.path.join("data", "penny_heads.png")
     f_tails = os.path.join("data", "penny_tails.png")
     
-    #Create the texts "Your choice:", "Computer's choice:" and "to continue, press any key" 
-    txt_user = visual.TextStim (win, pos = (-0.5,0.6), text='Your choice:')
-    txt_com = visual.TextStim (win, pos = (0.5,0.6), text="Computer's choice:")
-    txt_continue = visual.TextStim (win, pos = (0,-0.85), text="to continue, press any key", height = 0.08)
+    #get texts ready to be displayed
+    txt_user.draw()
+    txt_com.draw()
+    txt_continue.draw()
     
     #gets image of head of penny ready to be displayed if user chooses head
     if choice_subject == 'h':
-        heads = visual.ImageStim(win,size = (0.7,0.94), pos = (-0.5,-0.2), image=f_heads)
+        heads = visual.ImageStim(win,size = (0.68,0.92), pos = (-0.5,-0.2), image=f_heads)
         heads.draw()
         #gets image of head of penny ready to be displayed if computer chooses head
         if choice_computer == 'h':
-            heads = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_heads)
+            heads = visual.ImageStim(win,size = (0.68,0.92), pos = (0.5,-0.2), image=f_heads)
             heads.draw()
+            # raise wins by 1 and get info that the user won ready to be displayed
+            wins += 1
+            winner.draw()
         #gets image of tail of penny ready to be displayed if computer chooses tail
         else:
-            tails = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_tails)
+            tails = visual.ImageStim(win,size = (0.68,0.92), pos = (0.5,-0.2), image=f_tails)
             tails.draw()
-        #get text for user and computer ready to be displayed
-        txt_user.draw()
-        txt_com.draw()
-        txt_continue.draw()
+            # raise losses by 1 and get info that the user lost ready to be displayed
+            losses += 1
+            loser.draw()
+        #update the current score and get it ready to be displayed
+        score = score_function(wins, losses)
+        score.draw()
         #prints everything on the screen and waits for key to be pressed
         win.flip()
-        event.waitKeys() 
         
     #gets image of tail of penny ready to be displayed if user chooses tail    
     else:
-        tails = visual.ImageStim(win,size = (0.7,0.94), pos = (-0.5,-0.2), image=f_tails)
+        tails = visual.ImageStim(win,size = (0.68,0.92), pos = (-0.5,-0.2), image=f_tails)
         tails.draw()
         #gets image of head of penny ready to be displayed if computer chooses head
         if choice_computer == 'h':
-            heads = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_heads)
+            heads = visual.ImageStim(win,size = (0.68,0.92), pos = (0.5,-0.2), image=f_heads)
             heads.draw()
+            # raise losses by 1 and get info that the user lost ready to be displayed
+            losses += 1
+            loser.draw()
         #gets image of tail of penny ready to be displayed if computer chooses tail
         else:
-            tails = visual.ImageStim(win,size = (0.7,0.94), pos = (0.5,-0.2), image=f_tails)
+            tails = visual.ImageStim(win,size = (0.68,0.92), pos = (0.5,-0.2), image=f_tails)
             tails.draw()
-        #get text for user and computer ready to be displayed
-        txt_user.draw()
-        txt_com.draw()
-        txt_continue.draw()
+            # raise wins by 1 and get info that the user won ready to be displayed
+            wins += 1
+            winner.draw()
+        #update the current score and get it ready to be displayed
+        score = score_function(wins, losses)
+        score.draw()
         #prints everything on the screen and waits key to be pressed
         win.flip()
-        event.waitKeys() 
 
-# %% results round & game
-    
+    #wait a longer amount of time for a win than for a loss for well-being of user
     if choice_subject == choice_computer:
-        #display result of round to user
-        winner.draw()
-        win.flip()
-        #raise wins by 1  and wait shortly
-        wins += 1
-        core.wait(1.5) #wait a longer amount of time than for loss for well-being of user
-
+        core.wait(1.5)
     else:
-        #display result of round to user
-        loser.draw()
-        win.flip()
-        #raise losses by 1 and wait shortly
-        losses += 1
-        core.wait(1) #wait a shorter amount of time than for a win for well-being of user
-    
-    ##As an adaptation of the program, one might abstain from displaying the round info and instead ask the user for her estimate on the amounts of wins & losses conditional on different waiting times for wins & losses
+        core.wait(1)
+    response_key = event.waitKeys() 
+
+    #quit option
+    if response_key[0] == 'q':
+        break
+
+# %% displays the infos of the game so far at the end of the round
     
     #infos for user at the end of each round. Contains the number of rounds, wins, losses, changes from user's previous choice and changes from computer's previous choice
-    game_info = "This is round {}. You won {} times. You lost {} times. You changed your own choice {} times. You changed {} times from the computer's choice in the previous round."
-    game_info = game_info.format(rounds, wins, losses, choice_change_subject, choice_change_computer)     
+    txt_game_info = "Up until round {}. You won {} times. You lost {} times. You changed your own choice {} times. You changed {} times from the computer's choice in the previous round."
+    txt_game_info = txt_game_info.format(rounds, wins, losses, choice_change_subject, choice_change_computer)     
     
     #display result of the game so far to user
-    _game_info = visual.TextStim(win, text= game_info)
-    _game_info.draw()
+    game_info = visual.TextStim(win, text= txt_game_info)
+    game_info.draw()
+    score.draw()
+    txt_continue.draw()
     win.flip()
+    response_key = event.waitKeys()
+
+    ##As an adaptation of the program, one might abstain from displaying the score and game_info and instead ask the user for her estimate on the amounts of wins & losses conditional on different waiting times for wins & losses (as determined above)
 
     #raise rounds by 1
     rounds += 1
+    
+# %% displays the final score & some other information, finally closes the window
+    
+    #quit option
+    if response_key[0] == 'q':
+        break
 
-# %% super useful close statement that cannot be reached but feels like it has to be part of an experiment in psychopy
+amount_rounds = wins + losses
+
+txt_end = """
+
+You played {} rounds.
+
+The final score is:
+
+   You: {}
+        
+   Computer: {}
+        
+
+Thanks a lot for your participation!""".format(amount_rounds, wins, losses)
+
+stim_end = visual.TextStim(win, text= txt_end)
+stim_end.draw()
+win.flip()
+core.wait(6)
 
 win.close()
