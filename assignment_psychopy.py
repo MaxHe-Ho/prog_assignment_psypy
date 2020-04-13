@@ -133,6 +133,44 @@ frustrator = False
 
 # %% several functions, start of loop and cut_off variable
 
+def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator):
+    """
+    Checks if the combination of biases is valid, raises an error if not.
+    Closes win before raising the error to prevent win from getting stuck.
+
+    Parameters
+    ----------
+    bias_heads : bool
+        stores whether the computer should be biased towards choosing heads.
+    bias_tails : bool
+        stores whether the computer should be biased towards choosing tails.
+    bias_stick_to_prev_com_choice : bool
+        stores whether the computer should be biased towards sticking to its previous choice.
+    bias_switch_from_prev_com_choice : bool
+        stores whether the computer should be biased towards switching from its previous choice.
+    bias_stick_to_prev_user_choice : bool
+        stores whether the computer should be biased towards sticking to the user's previous choice.
+    bias_switch_from_prev_user_choice : bool
+        stores whether the computer should be biased towards sticking to the user's previous choice.
+    frustrator : bool
+        stores whether the computer should always choose the opposite of the user.
+
+    Raises
+    ------
+    ValueError
+        raises an exception if the bias function frustrator is combined with other functions.
+        This is because the frustrator doesn't work with probabilites and necessarily simply
+        overwrites all other biases. 
+    """
+    if frustrator == True:
+        if bias_heads or bias_tails or bias_stick_to_prev_com_choice or bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice or bias_switch_from_prev_user_choice == True:
+            win.close()
+            raise ValueError("Frustrator is not compatible with other biases as it would simply cover all other possible effects")
+
+# run the function right away to test for bad bias combis
+allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator)
+
+
 #function to give error message for bad values of the bias and except for that only returns the bias
 def bias_function (bias):
     """
@@ -170,47 +208,6 @@ def bias_function (bias):
                          are always <= 1 (at least on standard interpretations of probabilities).
                          Try a value that is between -0.5 and 0.5 instead!""")
     return bias
-
-
-def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator):
-    """
-    Simply returns all the bias functions. Closes win before raising the error to prevent win from getting stuck.
-
-    Parameters
-    ----------
-    bias_heads : function
-        a function that biases the computer towards choosing heads.
-    bias_tails : function
-        a function that biases the computer towards choosing tails.
-    bias_stick_to_prev_com_choice : function
-        a function that biases the computer towards sticking to its previous choice.
-    bias_switch_from_prev_com_choice : function
-        a function that biases the computer towards switching from its previous choice.
-    bias_stick_to_prev_user_choice : function
-        a function that biases the computer towards sticking to the user's previous choice.
-    bias_switch_from_prev_user_choice : function
-        a function that biases the computer towards sticking to the user's previous choice.
-    frustrator : function
-        a function that always chooses the opposite of the user.
-
-    Raises
-    ------
-    ValueError
-        raises an exception if the bias function frustrator is combined with other functions.
-        This is because the frustrator doesn't work with probabilites and necessarily simply
-        overwrites all other biases. 
-
-    Returns
-    -------
-    all the parameters listed above with identical properties.
-    """
-    if frustrator == True:
-        if bias_heads or bias_tails or bias_stick_to_prev_com_choice or bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice or bias_switch_from_prev_user_choice == True:
-            win.close()
-            raise ValueError("Frustrator is not compatible with other biases as it would simply cover all other possible effects")
-    return bias_heads and bias_tails and bias_stick_to_prev_com_choice and bias_switch_from_prev_com_choice and bias_stick_to_prev_user_choice and bias_switch_from_prev_user_choice and frustrator
-
-allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator)
 
 
 def stick_to_prev_com_choice_function (prev_com_choice, cut_off, bias):
