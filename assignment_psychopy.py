@@ -89,13 +89,15 @@ txt_continue.draw()
 win.flip()
 event.waitKeys()
 
-# %% necessary & self-explanatory variables
+# %% some self-explanatory variables
 
 wins = 0
 losses = 0
 rounds = 1
 choice_change_subject = 0
 choice_change_computer = 0
+prev_com_choice = 0
+prev_subj_choice = 0
 
 # %% bias variables
 
@@ -129,7 +131,7 @@ bias_switch_from_prev_user_choice = False
 frustrator = False
 ##As an adaptation of the program, one might collect data (as the amount of attempts and reaction times) from user reacting to frustrator in order to get e.g. some proxy of frustration tolerance or trust in the experimenter
 
-# %% bias functions, start of loop and cut_off variable
+# %% several functions, start of loop and cut_off variable
 
 #function to give error message for bad values of the bias and except for that only returns the bias
 def bias_function (bias):
@@ -211,14 +213,14 @@ def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, 
 allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator)
 
 
-def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
+def stick_to_prev_com_choice_function (prev_com_choice, cut_off, bias):
     """
     Biases the computer towards sticking to its previous choice
 
     Parameters
     ----------
-    choice_computer : str
-        stores the decision of the computer between heads and tails of the current round.
+    prev_com_choice : str
+        stores the decision of the computer between heads and tails of the previous round.
     cut_off : float
         stores a value which is used to compute the choice of the computer. 
         If a random generated float is smaller than the cut_off, the computer's decision is
@@ -232,21 +234,21 @@ def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
         updated version of the cut_off variable described above to bias the computer towards
         sticking to its previous choice.
     """
-    if choice_computer == 'h':
+    if prev_com_choice == 'h':
         cut_off = cut_off + bias_function(bias)
     else:
         cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
 
-def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
+def switch_from_prev_com_choice_function (prev_com_choice, cut_off, bias):
     """
     Biases the computer towards switching from its previous choice
 
     Parameters
     ----------
-    choice_computer : str
-        stores the decision of the computer between heads and tails of the current round.
+    prev_com_choice : str
+        stores the decision of the computer between heads and tails of the previous round.
     cut_off : float
         stores a value which is used to compute the choice of the computer. 
         If a random generated float is smaller than the cut_off, the computer's decision is
@@ -260,21 +262,21 @@ def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
         updated version of the cut_off variable described above to bias the computer towards
         switching from its previous choice.
     """
-    if choice_computer == 'h':
+    if prev_com_choice == 'h':
         cut_off = round (cut_off - bias_function(bias), 2)
     else:
         cut_off = cut_off + bias_function(bias)
     return cut_off
 
 
-def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
+def bias_stick_to_prev_user_choice_function (prev_subj_choice, cut_off, bias):
     """
     Biases the computer towards sticking to the user's previous choice
 
     Parameters
     ----------
-    choice_subject : str
-        stores the decision of the subject between heads and tails of the current round.
+    prev_subj_choice : str
+        stores the decision of the subject between heads and tails of the previous round.
     cut_off : float
         stores a value which is used to compute the choice of the computer. 
         If a random generated float is smaller than the cut_off, the computer's decision is
@@ -288,21 +290,21 @@ def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
         updated version of the cut_off variable described above to bias the computer towards
         sticking to the user's previous choice.
     """
-    if choice_subject == 'h':
+    if prev_subj_choice == 'h':
         cut_off = cut_off + bias_function(bias)
     else:
         cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
 
-def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
+def bias_switch_from_prev_user_choice_function (prev_subj_choice, cut_off, bias):
     """
    Biases the computer towards switching from the user's previous choice
 
     Parameters
     ----------
-    choice_subject : str
-        stores the decision of the subject between heads and tails of the current round.
+    prev_subj_choice : str
+        stores the decision of the subject between heads and tails of the previous round.
     cut_off : float
         stores a value which is used to compute the choice of the computer. 
         If a random generated float is smaller than the cut_off, the computer's decision is
@@ -316,7 +318,7 @@ def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
         updated version of the cut_off variable described above to bias the computer towards
         switching from the user's previous choice.
     """
-    if choice_subject == 'h':
+    if prev_subj_choice == 'h':
         cut_off = round (cut_off - bias_function(bias), 2)
     else:
         cut_off = cut_off + bias_function(bias)
@@ -419,34 +421,34 @@ To choose tails, press 't'."""
     
     #count the amount of changes the subject makes in their decisions relative to their previous choice
     if rounds > 1:
-        if choice_subject != keys[0]: #the variable choice_subject is undefined at this point but only gets used after it is defined, i.e. in the next round of the loop. As the same warning simply reoccurs in the following, I didn't comment it again.
+        if prev_subj_choice != keys[0]:
             choice_change_subject += 1
             
         #biases the computer towards sticking to the user's previous choice
         if bias_stick_to_prev_user_choice == True:
-            cut_off = bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias)
+            cut_off = bias_stick_to_prev_user_choice_function (prev_subj_choice, cut_off, bias)
         
         #biases the computer towards switching from the user's previous choice
         if bias_switch_from_prev_user_choice == True:
-            cut_off = bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias)
+            cut_off = bias_switch_from_prev_user_choice_function (prev_subj_choice, cut_off, bias)
         
     #choice_subject
     choice_subject = keys[0]
     
 # %% choice computer
     
-    #count the amount of changes the subject makes in their decisions relative to their previous choice
+    #count the amount of changes the subject makes in their decisions relative to the computer's previous choice
     if rounds > 1:
-        if choice_computer != choice_subject:
+        if prev_com_choice != choice_subject:
             choice_change_computer += 1   
             
         #biases the computer towards sticking to its previous choice
         if bias_stick_to_prev_com_choice == True:
-            cut_off = stick_to_prev_com_choice_function (choice_computer, cut_off, bias)
+            cut_off = stick_to_prev_com_choice_function (prev_com_choice, cut_off, bias)
         
         #biases the computer towards switching from its previous choice
         if bias_switch_from_prev_com_choice == True:
-            cut_off = switch_from_prev_com_choice_function (choice_computer, cut_off, bias)
+            cut_off = switch_from_prev_com_choice_function (prev_com_choice, cut_off, bias)
     
     #biases the computer towards heads
     if bias_heads == True:
@@ -560,8 +562,11 @@ To choose tails, press 't'."""
 
     ##As an adaptation of the program, one might abstain from displaying the score and game_info and instead ask the user for her estimate on the amounts of wins & losses conditional on different waiting times for wins & losses (as determined above)
 
-    #raise rounds by 1
+    #raise rounds by 1, update previous com and subj response
     rounds += 1
+    
+    prev_com_choice = choice_computer
+    prev_subj_choice = choice_subject
     
 # %% displays the final score & some other information, finally closes the window
     
