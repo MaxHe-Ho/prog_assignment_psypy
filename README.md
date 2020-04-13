@@ -22,7 +22,7 @@ The programme automatically prints the following information after each round:
 
 ## How to use the program
 Best download the whole zip file from this repository, unpack it and run the main program. There's an additional file for testing the functions of the main program. 
-Everything the user needs to know is explained on the screen that pops up when running the program. Regarding the experimenter: Changing the biases is straightforward and explained in detail in comments within the main program. Details about how the program runs are included in the comments & docstrings in the main program. 
+Everything the user needs to know is explained on the screen that pops up when running the program. Regarding the experimenter: Changing the biases is straightforward and explained in detail in comments within the main program. Details about how the program runs are included in the comments & docstrings in the main program. Comments that start with "##" indicate a suggestion for an adaptation of the program.
 
 By pressing 'h', the subject chooses heads and by pressing 't', the subject chooses tails. The computer chooses 
 randomly or according to the bias that is currently setup. After the subject has made their choice, both pennies are shown on the screen and subject gets the information whether they won and what the current scores are. The subject can quit at any point by pressing 'q' or 'escape'.
