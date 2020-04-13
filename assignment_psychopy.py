@@ -41,10 +41,10 @@ txt_user = visual.TextStim (win, pos = (-0.5,0.42), text='Your choice:')
 txt_com = visual.TextStim (win, pos = (0.5,0.42), text="Computer's choice:")
 txt_continue = visual.TextStim (win, pos = (0,-0.85), text="Press any key to continue", height = 0.08)
 
-#function that generates the updated score stimulus ready to be displayed on the screen
+
 def score_function (wins, losses):
     """
-    Generates visual TextStim with score of the current round and specifies its location on the screen
+    Generates visual.text.TextStim with score of the current round and specifies its location on the screen
 
     Parameters
     ----------
@@ -57,7 +57,6 @@ def score_function (wins, losses):
     -------
     score: visual.text.TextStim
             Visual stimulus of the current score ready to be displayed
-
     """
     txt_score = """Score:
 {} - {}"""
@@ -135,7 +134,7 @@ frustrator = False
 #function to give error message for bad values of the bias and except for that only returns the bias
 def bias_function (bias):
     """
-    Simply returns the bias
+    Simply returns the bias. Closes win before raising the error to prevent win from getting stuck.
     
     Parameters
     ----------
@@ -153,7 +152,6 @@ def bias_function (bias):
     -------
     bias : float
         the bias of the computer chosen by the experimenter.
-
     """
     if bias < -0.5:
         win.close()
@@ -171,67 +169,68 @@ def bias_function (bias):
                          Try a value that is between -0.5 and 0.5 instead!""")
     return bias
 
-#function for allowed combinations of biases
+
 def allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator):
     """
-    simply returns all the bias functions
+    Simply returns all the bias functions. Closes win before raising the error to prevent win from getting stuck.
 
     Parameters
     ----------
-    bias_heads : function/ bool
-        DESCRIPTION.
-    bias_tails : TYPE
-        DESCRIPTION.
-    bias_stick_to_prev_com_choice : TYPE
-        DESCRIPTION.
-    bias_switch_from_prev_com_choice : TYPE
-        DESCRIPTION.
-    bias_stick_to_prev_user_choice : TYPE
-        DESCRIPTION.
-    bias_switch_from_prev_user_choice : TYPE
-        DESCRIPTION.
-    frustrator : TYPE
-        DESCRIPTION.
+    bias_heads : function
+        a function that biases the computer towards choosing heads.
+    bias_tails : function
+        a function that biases the computer towards choosing tails.
+    bias_stick_to_prev_com_choice : function
+        a function that biases the computer towards sticking to its previous choice.
+    bias_switch_from_prev_com_choice : function
+        a function that biases the computer towards switching from its previous choice.
+    bias_stick_to_prev_user_choice : function
+        a function that biases the computer towards sticking to the user's previous choice.
+    bias_switch_from_prev_user_choice : function
+        a function that biases the computer towards sticking to the user's previous choice.
+    frustrator : function
+        a function that always chooses the opposite of the user.
 
     Raises
     ------
     ValueError
         raises an exception if the bias function frustrator is combined with other functions.
         This is because the frustrator doesn't work with probabilites and necessarily simply
-        overwrite all other biases. Closes win before raising the error to prevent win from getting stuck.
+        overwrites all other biases. 
 
     Returns
     -------
     all the parameters listed above with identical properties.
-
     """
     if frustrator == True:
         if bias_heads or bias_tails or bias_stick_to_prev_com_choice or bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice or bias_switch_from_prev_user_choice == True:
-            #win.close()
+            win.close()
             raise ValueError("Frustrator is not compatible with other biases as it would simply cover all other possible effects")
     return bias_heads and bias_tails and bias_stick_to_prev_com_choice and bias_switch_from_prev_com_choice and bias_stick_to_prev_user_choice and bias_switch_from_prev_user_choice and frustrator
 
 allowed_bias_combis (bias_heads, bias_tails, bias_stick_to_prev_com_choice, bias_switch_from_prev_com_choice, bias_stick_to_prev_user_choice, bias_switch_from_prev_user_choice, frustrator)
 
-#function to bias the computer towards sticking to its previous choice
+
 def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
     """
-    
+    Biases the computer towards sticking to its previous choice
 
     Parameters
     ----------
-    choice_computer : TYPE
-        DESCRIPTION.
-    cut_off : TYPE
-        DESCRIPTION.
-    bias : TYPE
-        DESCRIPTION.
+    choice_computer : str
+        stores the decision of the computer between heads and tails of the current round.
+    cut_off : float
+        stores a value which is used to compute the choice of the computer. 
+        If a random generated float is smaller than the cut_off, the computer's decision is
+        heads, otherwise it is tails.
+    bias : float
+        stores a value to bias the computer to the extend of the value.
 
     Returns
     -------
-    cut_off : TYPE
-        DESCRIPTION.
-
+    cut_off : float
+        updated version of the cut_off variable described above to bias the computer towards
+        sticking to its previous choice.
     """
     if choice_computer == 'h':
         cut_off = cut_off + bias_function(bias)
@@ -239,25 +238,27 @@ def stick_to_prev_com_choice_function (choice_computer, cut_off, bias):
         cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
-#function to bias the computer towards switching from its previous choice
+
 def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
     """
-    
+    Biases the computer towards switching from its previous choice
 
     Parameters
     ----------
-    choice_computer : TYPE
-        DESCRIPTION.
-    cut_off : TYPE
-        DESCRIPTION.
-    bias : TYPE
-        DESCRIPTION.
+    choice_computer : str
+        stores the decision of the computer between heads and tails of the current round.
+    cut_off : float
+        stores a value which is used to compute the choice of the computer. 
+        If a random generated float is smaller than the cut_off, the computer's decision is
+        heads, otherwise it is tails.
+    bias : float
+        stores a value to bias the computer to the extend of the value.
 
     Returns
     -------
-    cut_off : TYPE
-        DESCRIPTION.
-
+    cut_off : float
+        updated version of the cut_off variable described above to bias the computer towards
+        switching from its previous choice.
     """
     if choice_computer == 'h':
         cut_off = round (cut_off - bias_function(bias), 2)
@@ -265,25 +266,27 @@ def switch_from_prev_com_choice_function (choice_computer, cut_off, bias):
         cut_off = cut_off + bias_function(bias)
     return cut_off
 
-#function to bias the computer towards sticking to the user's previous choice
+
 def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
     """
-    
+    Biases the computer towards sticking to the user's previous choice
 
     Parameters
     ----------
-    choice_subject : TYPE
-        DESCRIPTION.
-    cut_off : TYPE
-        DESCRIPTION.
-    bias : TYPE
-        DESCRIPTION.
+    choice_subject : str
+        stores the decision of the subject between heads and tails of the current round.
+    cut_off : float
+        stores a value which is used to compute the choice of the computer. 
+        If a random generated float is smaller than the cut_off, the computer's decision is
+        heads, otherwise it is tails.
+    bias : float
+        stores a value to bias the computer to the extend of the value.
 
     Returns
     -------
-    cut_off : TYPE
-        DESCRIPTION.
-
+    cut_off : float
+        updated version of the cut_off variable described above to bias the computer towards
+        sticking to the user's previous choice.
     """
     if choice_subject == 'h':
         cut_off = cut_off + bias_function(bias)
@@ -291,25 +294,27 @@ def bias_stick_to_prev_user_choice_function (choice_subject, cut_off, bias):
         cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
-#function to bias the computer towards switching from the user's previous choice
+
 def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
     """
-    
+   Biases the computer towards switching from the user's previous choice
 
     Parameters
     ----------
-    choice_subject : TYPE
-        DESCRIPTION.
-    cut_off : TYPE
-        DESCRIPTION.
-    bias : TYPE
-        DESCRIPTION.
+    choice_subject : str
+        stores the decision of the subject between heads and tails of the current round.
+    cut_off : float
+        stores a value which is used to compute the choice of the computer. 
+        If a random generated float is smaller than the cut_off, the computer's decision is
+        heads, otherwise it is tails.
+    bias : float
+        stores a value to bias the computer to the extend of the value.
 
     Returns
     -------
-    cut_off : TYPE
-        DESCRIPTION.
-
+    cut_off : float
+        updated version of the cut_off variable described above to bias the computer towards
+        switching from the user's previous choice.
     """
     if choice_subject == 'h':
         cut_off = round (cut_off - bias_function(bias), 2)
@@ -317,65 +322,69 @@ def bias_switch_from_prev_user_choice_function (choice_subject, cut_off, bias):
         cut_off = cut_off + bias_function(bias)
     return cut_off
 
-#function to bias the computer towards heads
+
 def bias_heads_function (cut_off, bias):
     """
-    
+    Biases the computer towards choosing heads
 
     Parameters
     ----------
-    cut_off : TYPE
-        DESCRIPTION.
-    bias : TYPE
-        DESCRIPTION.
+    cut_off : float
+        stores a value which is used to compute the choice of the computer. 
+        If a random generated float is smaller than the cut_off, the computer's decision is
+        heads, otherwise it is tails.
+    bias : float
+        stores a value to bias the computer to the extend of the value.
 
     Returns
     -------
-    cut_off : TYPE
-        DESCRIPTION.
-
+    cut_off : float
+        updated version of the cut_off variable described above to bias the computer towards
+        choosing heads.
     """
     cut_off = cut_off + bias_function(bias)
     return cut_off
 
-#function to bias the computer towards tails
+
 def bias_tails_function (cut_off, bias):
     """
-    
+    Biases the computer towards choosing tails
 
     Parameters
     ----------
-    cut_off : TYPE
-        DESCRIPTION.
-    bias : TYPE
-        DESCRIPTION.
+    cut_off : float
+        stores a value which is used to compute the choice of the computer. 
+        If a random generated float is smaller than the cut_off, the computer's decision is
+        heads, otherwise it is tails.
+    bias : float
+        stores a value to bias the computer to the extend of the value.
 
     Returns
     -------
-    cut_off : TYPE
-        DESCRIPTION.
-
+    cut_off : float
+        updated version of the cut_off variable described above to bias the computer towards
+        choosing tails.
     """
     cut_off = round (cut_off - bias_function(bias), 2)
     return cut_off
 
-#function to turn the computer into a frustrator
+
 def frustrator_function (choice_subject, choice_computer):
     """
-    
+    Lets the computer always choose the opposite of the user
 
     Parameters
     ----------
-    choice_subject : TYPE
-        DESCRIPTION.
-    choice_computer : TYPE
-        DESCRIPTION.
+    choice_subject : str
+        stores the decision of the subject between heads and tails of the current round.
+    choice_computer : str
+        stores the decision of the computer between heads and tails of the current round.
 
     Returns
     -------
-    choice_computer : TYPE
-        DESCRIPTION.
-
+    choice_computer : str
+        updated version of the choice_computer variable described above. Now always the opposite
+        of choice_subject.
     """
     if choice_subject == 'h':
         choice_computer = 't'
@@ -465,7 +474,7 @@ To choose tails, press 't'."""
         choice_computer = frustrator_function (choice_subject, choice_computer)
     
     
-# %% Display choice of the user and computer with images as well as results with text
+# %% Displays choice of the user and computer with images as well as results with text
     
     #save path of images
     f_heads = os.path.join("data", "penny_heads.png")
