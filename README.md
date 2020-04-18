@@ -4,7 +4,7 @@
 Click [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/assignment_psychopy.py) to get to the main program.
 
 This program allows the user to play a game of matching pennies against the computer. The user is the even player. This means that if both pennies match, the user (even player) wins the round and gets a point and if they don't, the computer gets a point. 
-The computer can be setup with different biases. It chooses randomly by default but the code allows different biases to be implemented quite easily, comments point out the slight necessary changes.
+The computer can be setup with different biases. It chooses randomly by default but the code allows different biases to be implemented quite easily, comments point out the slight necessary changes in the "bias variables" section of the main program.
 The biases are:
 - a bias for heads and one for tails
 - a bias for letting the computer stick to its previous choice and one for letting it switch from its previous choice
