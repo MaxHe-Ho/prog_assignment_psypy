@@ -13,12 +13,13 @@ Additional features:
       from its or users choice in the previous round. Computer can also be turned into a frustrator.
     - Printout at the end of the program showing how often the subject switched their choice from own & computers choice in previous round.
 """
+# %% imports
 
 import os
 import random
 from psychopy import data, event, core, visual
 
-# %% Window & Text stimuli
+# %% Window, text stimuli, paths to images and score_function
 
 win = visual.Window(color='black')
 
@@ -41,6 +42,9 @@ txt_user = visual.TextStim (win, pos = (-0.5,0.42), text='Your choice:')
 txt_com = visual.TextStim (win, pos = (0.5,0.42), text="Computer's choice:")
 txt_continue = visual.TextStim (win, pos = (0,-0.85), text="Press any key to continue", height = 0.08)
 
+#save path of images used later on
+f_heads = os.path.join("data", "penny_heads.png")
+f_tails = os.path.join("data", "penny_tails.png")
 
 def score_function (wins, losses):
     """
@@ -101,15 +105,17 @@ prev_subj_choice = 0
 
 # %% bias variables
 
-#change value of the bias variable to determine the bias of the computer i.e. the degree to which its decision will diverge from a 50/50 chance for heads and tails 
-#the value determines the degree of all the (possible) biases below (if they are activated)
-#choose a bias between -0.5 and +0.5! 
+#change value of the bias variable to determine the bias of the computer i.e. the degree to which its decision will diverge from a 50/50 chance for heads and tails.
+#E.g. if you set the bias at 0.4, it will add 0.4 to the default value 0.5 (i.e. the cut-off defined below) yielding a 90% probability for the outcome specified
+#in the biases below, say a 90% probability for heads. This shows that the bias determines the degree of all the (possible) biases below (if they are activated).
+#Choose a bias between -0.5 and 0.5 because the bias is added to the default value of 0.5 so that values bigger than 0.5 or smaller than -0.5 won't make sense.  
 bias = 0.4
 
 ##As an adaptation of this program to make it psychologically more interesting and turn it into a test somewhat like the Wisconsin Card Sorting Test, the user could be asked to find out the bias of the computer which is changed at times
-#change one of the following biases to True if you want that bias to be implemented
-#to make the program flexible, the biases can be freely combined amongst each other except for the frustrator, 
-#which cannot be combined with another bias. Though of course the effects of some biases cancel each other out
+
+#change one of the following biases to True if you want that bias to be implemented. To make the program flexible, the biases can be freely combined amongst each 
+#other except for the frustrator, which cannot be combined with another bias. Note that the effects of some biases cancel each other out or might cause the computer
+#to stick to heads or tails indefinetely (depending also on the value of bias). So choose wisely! 
 
 #To bias the computer towards choosing heads more often, set the "bias_heads"-variable to True (and perhaps adjust the bias above)
 bias_heads = False
@@ -129,6 +135,7 @@ bias_switch_from_prev_user_choice = False
 #In case you want to be evil and turn the computer into a frustrator, i.e. a device that always chooses the opposite of the user and thus 
 #guarantees that the user looses, set the "frustrator"-variable to True. 
 frustrator = False
+
 ##As an adaptation of the program, one might collect data (as the amount of attempts and reaction times) from user reacting to frustrator in order to get e.g. some proxy of frustration tolerance or trust in the experimenter
 
 # %% several functions, start of loop and cut_off variable
@@ -474,10 +481,6 @@ To choose tails, press 't'."""
     
     
 # %% Displays choice of the user and computer with images as well as results with text
-    
-    #save path of images
-    f_heads = os.path.join("data", "penny_heads.png")
-    f_tails = os.path.join("data", "penny_tails.png")
     
     #get texts ready to be displayed
     txt_user.draw()
