@@ -27,6 +27,9 @@ Everything the user needs to know is explained on the screen that pops up when r
 By pressing 'h', the subject chooses heads and by pressing 't', the subject chooses tails. The computer chooses 
 randomly or according to the bias that is currently setup. After the subject has made their choice, both pennies are shown on the screen and subject gets the information whether they won and what the current scores are. The subject can quit at any point by pressing 'q' or 'escape'.
 
+In case you're running the test_ program, even if you usually have pytest installed, you may need to install pytest again in
+the virtual environment for psychopy. Alternatively, you can of course also run the test program in the normal (base) environment.
+
 ### Code style
 The code has been checked to adhere to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) conventions using [pycodestyle](http://pycodestyle.pycqa.org/en/stable/index.html).
 
