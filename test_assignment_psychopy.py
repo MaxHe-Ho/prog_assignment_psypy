@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-Testing of the functions in the matching pennies game
+Testing of the functions in the matching pennies game.
+
+The code has been checked to stick to the PEP 8 conventions using pycodestyle.
 """
 
 # %% Setup: Imports, functions and variables
 
 import random
+# Even if you usually have pytest installed, you may need to install pytest in
+# the virtual environment for psychopy
+import pytest
 
 # copy paste of the functions that are to be tested as importing the functions
 # unfortunately runs the whole assignment_psychopy program and opens the win
@@ -295,23 +300,61 @@ def frustrator_function(choice_subject, choice_computer):
     return choice_computer
 
 
-###########################################################################################
-## still missing test of score_function; however how shoud it be tested as it opens win? ##
-###########################################################################################
-
 cut_off = 0.5
 bias = 0.4
 
 # %% defines test functions
 
-# no testing of quit_function and bias_function because they simply return
-# variables or functions unless some error is triggered.
-# ??? no testing of allowed bias combis because it doesn't have a return value
+# No testing of quit_function because it is extremely simple. Equally, no
+# testing of the score_function because it relies on an open visual window.
+
+
+# test whether allowed_bias_combis successfully raises an error given the
+# right circumstances.
+def test_allowed_bias_combis():
+
+    frustrator = random.choice([True, False])
+    bias_heads = random.choice([True, False])
+    bias_tails = random.choice([True, False])
+    bias_stick_to_prev_com_choice = random.choice([True, False])
+    bias_switch_from_prev_com_choice = random.choice([True, False])
+    bias_stick_to_prev_user_choice = random.choice([True, False])
+    bias_switch_from_prev_user_choice = random.choice([True, False])
+
+    if frustrator is True:
+        if (bias_heads or bias_tails or bias_stick_to_prev_com_choice or
+            bias_switch_from_prev_com_choice or bias_stick_to_prev_user_choice
+                or bias_switch_from_prev_user_choice) is True:
+            with pytest.raises(ValueError):
+                allowed_bias_combis(bias_heads, bias_tails,
+                                    bias_stick_to_prev_com_choice,
+                                    bias_switch_from_prev_com_choice,
+                                    bias_stick_to_prev_user_choice,
+                                    bias_switch_from_prev_user_choice,
+                                    frustrator)
+
+
+def test_bias_function():
+
+    bias = random.uniform(-1, 1)
+
+    if bias < -0.5:
+        with pytest.raises(ValueError):
+            bias_function(bias)
+    elif bias > 0.5:
+        with pytest.raises(ValueError):
+            bias_function(bias)
+    elif bias >= -0.5:
+        bias_function(bias) == bias
+    else:
+        bias_function(bias) == bias
 
 
 # test of function to bias the computer towards sticking to its previous choice
 def test_stick_to_prev_com_choice_function():
+
     prev_com_choice = random.choice(['h', 't'])
+
     if prev_com_choice == "h":
         case_heads = stick_to_prev_com_choice_function(prev_com_choice,
                                                        cut_off, bias)
@@ -325,7 +368,9 @@ def test_stick_to_prev_com_choice_function():
 # test of function to bias the computer towards switching from its
 # previous choice
 def test_switch_from_prev_com_choice_function():
+
     prev_com_choice = random.choice(['h', 't'])
+
     if prev_com_choice == "h":
         case_heads = switch_from_prev_com_choice_function(prev_com_choice,
                                                           cut_off, bias)
@@ -339,7 +384,9 @@ def test_switch_from_prev_com_choice_function():
 # test of function to bias the computer towards sticking to the user's
 # previous choice
 def test_bias_stick_to_prev_user_choice_function():
+
     prev_subj_choice = random.choice(['h', 't'])
+
     if prev_subj_choice == "h":
         case_heads = bias_stick_to_prev_user_choice_function(prev_subj_choice,
                                                              cut_off, bias)
@@ -353,7 +400,9 @@ def test_bias_stick_to_prev_user_choice_function():
 # test of function to bias the computer towards switching from the user's
 # previous choice
 def test_bias_switch_from_prev_user_choice_function():
+
     prev_subj_choice = random.choice(['h', 't'])
+
     if prev_subj_choice == "h":
         case_heads = bias_switch_from_prev_user_choice_function(prev_subj_choice,
                                                                 cut_off, bias)
@@ -376,7 +425,9 @@ def test_bias_tails_function():
 
 # test of the frustrator function
 def test_frustrator_function():
+
     choice_subject = random.choice(['h', 't'])
+
     if choice_subject == 'h':
         choice_computer = 't'
     else:
@@ -395,6 +446,8 @@ test_bias_tails_function()
 
 # To be sure they work, tests with random values are tested several times below
 for repeats in range(50):
+    test_allowed_bias_combis()
+    test_bias_function()
     test_stick_to_prev_com_choice_function()
     test_switch_from_prev_com_choice_function()
     test_bias_stick_to_prev_user_choice_function()

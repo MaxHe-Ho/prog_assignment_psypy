@@ -19,6 +19,8 @@ Additional features:
     previous round. Computer can also be turned into a frustrator.
 - Printout at the end of the program showing how often the subject switched
     their choice from own & computers choice in previous round.
+
+The code has been checked to stick to the PEP 8 conventions using pycodestyle.
 """
 # %% imports
 
