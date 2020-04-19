@@ -27,11 +27,11 @@ Everything the user needs to know is explained on the screen that pops up when r
 By pressing 'h', the subject chooses heads and by pressing 't', the subject chooses tails. The computer chooses 
 randomly or according to the bias that is currently setup. After the subject has made their choice, both pennies are shown on the screen and subject gets the information whether they won and what the current scores are. The subject can quit at any point by pressing 'q' or 'escape'.
 
+### Code style
+The code has been checked to adhere to the [PEP 8](https://www.python.org/dev/peps/pep-0008/) conventions using [pycodestyle](http://pycodestyle.pycqa.org/en/stable/index.html).
+
 ### Data
 Click [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/tree/master/data) to get to the two images of a penny that the programm uses.
 
 ### License information
 If you actually want to read license information, you can find it [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/LICENSE).
-
-#### Such wow! Much useful information about yourself you always wanted to have!!
-To find out details about your greatest ability, way more reliable than online personality tests and horoscopes, click [here](https://en.wikipedia.org/wiki/Procrastination). 
