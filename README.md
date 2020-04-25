@@ -1,5 +1,6 @@
 # prog_assignment_psypy
 
+
 ## The game: Matching pennies
 Click [here](https://github.com/MaxHe-Ho/prog_assignment_psypy/blob/master/assignment_psychopy.py) to get to the main program.
 
@@ -12,13 +13,16 @@ The biases are:
 - a bias that turns the computer into a frustrator, i.e. a device that always chooses the opposite of the user and thus 
 guarantees that the user looses
 
-For all the biases, the strenght/ extent of the bias can be changed. Additionally, all the biases except for the frustrator-bias can be freely combined. Though of course the effects of some biases (e.g. for both heads & tails) cancel each other out.
+For all the biases, the strenght/ extent of the bias can be changed. Additionally, all the biases except for the frustrator-bias can be freely combined. Though of course the effects of some biases (e.g. for both heads & tails) cancel each other out or might cause the computer to stick to heads or tails indefinetely (depending on the value of bias).
 
 The programme automatically prints the following information after each round:
   - The amount of wins of the user and computer
   - The current score
   - How often the subject switched their choice compared to their choice in the previous round
   - How often the subject switched their choice compared to the computer’s choice in the previous round
+  
+ After the user quit the game using 'q', the final score is displayed, as well as the total amount of rounds played.
+ 
 
 ## How to use the program
 Best download the whole zip file from this repository, unpack it and run the main program (which is called assignment_psychopy.py). Be sure you run it in the virtual environment for psychopy as usual for psychopy programs. 
