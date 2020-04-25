@@ -23,7 +23,7 @@ The programme automatically prints the following information after each round:
 ## How to use the program
 Best download the whole zip file from this repository, unpack it and run the main program (which is called assignment_psychopy.py). Be sure you run it in the virtual environment for psychopy as usual for psychopy programs. 
 
-If you happen to need it, click [here](https://github.com/luketudge/introduction-to-programming/blob/b1010a12602bde5be5184e55190528c219ee7dac/content/extras/software/psychopy.ipynb) for detailed instructions on installing psychopy and setting up the virtual environment.
+If you happen to need it, click [here](https://www.psychopy.org/download.html) for the official instructions on installing psychopy and setting up the virtual environment or click [here](https://github.com/luketudge/introduction-to-programming/blob/b1010a12602bde5be5184e55190528c219ee7dac/content/extras/software/psychopy.ipynb) for more comprehensive instructions.
 
 There's an additional file for testing the functions of the main program. 
 
