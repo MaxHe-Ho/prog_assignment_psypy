@@ -8,8 +8,8 @@ The code has been checked to stick to the PEP 8 conventions using pycodestyle.
 # %% Setup: Imports, functions and variables
 
 import random
-# Even if you usually have pytest installed, you may need to install pytest in
-# the virtual environment for psychopy
+# Even if you usually have pytest installed, you may need to install pytest
+# again in the virtual environment for psychopy
 import pytest
 
 # copy paste of the functions that are to be tested as importing the functions

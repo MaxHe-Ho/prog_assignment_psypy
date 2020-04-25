@@ -172,7 +172,7 @@ bias_stick_to_prev_user_choice = False
 bias_switch_from_prev_user_choice = False
 
 # In case you want to be evil and turn the computer into a frustrator, i.e. a
-# device that always chooses the opposite of the user and thus #guarantees that
+# device that always chooses the opposite of the user and thus guarantees that
 # the user looses, set the "frustrator"-variable to True.
 frustrator = False
 
@@ -294,8 +294,7 @@ def stick_to_prev_com_choice_function(prev_com_choice, cut_off, bias):
     cut_off : float
         stores a value which is used to compute the choice of the computer.
         If a random generated float is smaller than the cut_off, the computer's
-        decision is
-        heads, otherwise it is tails.
+        decision is heads, otherwise it is tails.
     bias : float
         stores a value to bias the computer to the extend of the value.
 
@@ -324,8 +323,7 @@ def switch_from_prev_com_choice_function(prev_com_choice, cut_off, bias):
     cut_off : float
         stores a value which is used to compute the choice of the computer.
         If a random generated float is smaller than the cut_off, the computer's
-        decision is
-        heads, otherwise it is tails.
+        decision is heads, otherwise it is tails.
     bias : float
         stores a value to bias the computer to the extend of the value.
 
@@ -480,7 +478,7 @@ while True:
     # from the previous rounds to influence the next decisions by the computer
     cut_off = 0.5
 
-# %%
+# %% displays round info before the start of each round
     round_txt = """This is round {}
 
 
@@ -664,11 +662,10 @@ choice in the previous round."""
 
     # raise rounds by 1, update previous com and subj response
     rounds += 1
-
     prev_com_choice = choice_computer
     prev_subj_choice = choice_subject
 
-# %% displays the final score & some other information, finally closes the win
+# %% displays the final score & some other information, finally closes win
 
     # quit option
     if response_key[0] == 'q':
