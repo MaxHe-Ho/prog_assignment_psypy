@@ -12,7 +12,7 @@ The biases are:
 - a bias that turns the computer into a frustrator, i.e. a device that always chooses the opposite of the user and thus 
 guarantees that the user looses
 
-For all the biases, the strenght/ extend of the bias can be changed. Additionally, all the biases except for the frustrator-bias can be freely combined. Though of course the effects of some biases (e.g. for both heads & tails) cancel each other out.
+For all the biases, the strenght/ extent of the bias can be changed. Additionally, all the biases except for the frustrator-bias can be freely combined. Though of course the effects of some biases (e.g. for both heads & tails) cancel each other out.
 
 The programme automatically prints the following information after each round:
   - The amount of wins of the user and computer
@@ -21,7 +21,8 @@ The programme automatically prints the following information after each round:
   - How often the subject switched their choice compared to the computer’s choice in the previous round
 
 ## How to use the program
-Best download the whole zip file from this repository, unpack it and run the main program. There's an additional file for testing the functions of the main program. 
+Best download the whole zip file from this repository, unpack it and run the main program (which is called assignment_psychopy.py). Be sure you run it in the virtual environment for psychopy as usual for psychopy programs. Click [here](https://github.com/luketudge/introduction-to-programming/blob/b1010a12602bde5be5184e55190528c219ee7dac/content/extras/software/psychopy.ipynb) for detailed instructions on installing psychopy and setting up the virtual environment. 
+There's an additional file for testing the functions of the main program. 
 Everything the user needs to know is explained on the screen that pops up when running the program. Regarding the experimenter: Changing the biases is straightforward and explained in detail in comments within the main program. Details about how the program runs are included in the comments & docstrings in the main program. Comments that start with "##" indicate a suggestion for an adaptation of the program.
 
 By pressing 'h', the subject chooses heads and by pressing 't', the subject chooses tails. The computer chooses 
